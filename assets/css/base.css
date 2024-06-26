@@ -107,6 +107,9 @@ body {
     --color-poll-proportion-bar-bg: var(--light, var(--color-gray-250)) var(--dark, var(--color-dt-gray-300));
     --color-poll-choice-bg: var(--light, var(--color-gray-150)) var(--dark, var(--color-dt-gray-500));
 
+    --color-post-reveal-truncated-content-button: var(--light, var(--color-primary-500)) var(--dark, var(--color-primary-700));
+    --color-post-reveal-truncated-content-button-hover: var(--light, var(--color-primary-400)) var(--dark, var(--color-primary-600));
+
     --color-post-footer: var(--light, var(--color-gray-500)) var(--dark, var(--color-dt-gray-250));
     --color-post-footer-post-interaction: var(--light, var(--color-gray-500)) var(--dark, var(--color-dt-gray-225));
     --color-post-tag-bg: var(--light, var(--color-gray-125)) var(--dark, var(--color-dt-gray-575));
