@@ -120,6 +120,10 @@ class NPFFormatter(npf_renderer.format.Formatter):
             "forbid_external_iframes": forbid_external_iframes
         }
 
+        if request:
+            # Asking to expand a post is the reverse of asking to truncate a post
+            initialization_arguments["truncate"] = not request.ctx.preferences.expand_posts
+
         super().__init__(**initialization_arguments)
 
         # We store the blog and post ID as to be able to render a link to

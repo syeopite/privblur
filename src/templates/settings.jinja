@@ -58,6 +58,16 @@
                 {%- endfor %}
                 </select>
             </div>
+            <hr>
+            <div id="expand-posts-option" aria-describedby="expand-posts-info-box">
+                <div class="option-info-box">
+                    <label for="expand-posts-checkbox">{{translate(request.ctx.language, "settings_expand_blogger_truncated_posts")}}</label>
+                    <p id="expand-posts-info-box">{{translate(request.ctx.language, "settings_expand_blogger_truncated_posts_desc")}}</p>
+                </div>
+
+                <input type="checkbox" id="expand-posts-checkbox" name="expand_posts" {% if request.ctx.preferences.expand_posts == true %}checked{% endif %}/>
+                <input type="hidden" id="expand-posts-checkbox" name="expand_posts" value="off"/>
+            </div>
         </div>
         <div id="settings-footer">
             <div id="copy-as-bookmarklet-container">

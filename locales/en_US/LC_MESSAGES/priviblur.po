@@ -297,3 +297,9 @@ msgstr "Oldest first"
 
 msgid "post_note_viewer_view_replies_filter_sort_newest"
 msgstr "Newest first"
+
+msgid "settings_expand_blogger_truncated_posts"
+msgstr "Expand posts"
+
+msgid "settings_expand_blogger_truncated_posts_desc"
+msgstr "Expands truncated posts automatically"

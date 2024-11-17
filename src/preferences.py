@@ -11,6 +11,8 @@ class UserPreferences:
     language: str
     theme: str
 
+    expand_posts: bool
+
     # Tracks major revisions of the settings cookie
     # Only bump in case of breaking changes.
     version: int = 1
