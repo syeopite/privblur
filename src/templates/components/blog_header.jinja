@@ -1,5 +1,5 @@
 {% if blog.blog_info.description_npf -%}
-    {% set contains_errors, content_tag = format_npf(blog.blog_info.description_npf) -%}
+    {% set contains_errors, content_tag = format_npf(blog.blog_info.description_npf, request=request) -%}
 {% else -%}
     {% set content_tag = "" %}
 {% endif -%}

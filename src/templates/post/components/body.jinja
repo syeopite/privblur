@@ -4,6 +4,7 @@
                     element.content,
                     element.layout,
                     poll_callback=create_poll_callback(request.app.ctx, element.blog.name, element.id),
+                    request=request,
                 )
         -%}
     {%- else -%}
@@ -12,6 +13,7 @@
                     element.layout,
                     element.blog.name,
                     element.id,
+                    request=request,
                 )
         -%}
     {% endif %}
@@ -38,6 +40,7 @@
                             trail_element.content,
                             trail_element.layout,
                             poll_callback=create_poll_callback(request.app.ctx, element.blog.name, element.id),
+                            request=request,
                         )
                 -%}
 
@@ -47,6 +50,7 @@
                             trail_element.layout,
                             element.blog.name,
                             element.id,
+                            request=request,
                         )
                 -%}
             {% endif %}
