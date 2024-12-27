@@ -1,0 +1,26 @@
+{% set url = ((request.app.ctx.PRIVIBLUR_CONFIG.deployment.domain or "") + "/" + blog.blog_info.name)%}
+{% extends "rss/base.xml.jinja" %}
+{% block title %}{{blog.blog_info.name | e}}{% endblock %}
+{% block logo %}
+    <image>
+        <url>{{url_handler(blog.blog_info.avatar[-2].url)}}</url>
+        <title>{{translate(request.ctx.language, "blog_avatar_alt")}}</title>
+        <link>{{url}}</link>
+    </image>
+    <atom:logo><atom:icon>{{url_handler(blog.blog_info.avatar[-2].url)}}</atom:icon></atom:logo>
+{% endblock %}
+{% block author %}<name>{{blog.blog_info.name}}</name>{% endblock %}
+
+{% block description %}
+    {%- if blog.blog_info.description_npf -%}
+        {%- set _, description_html = format_npf(blog.blog_info.description_npf) -%}
+    {%- else -%}
+        {%- set description_html = "" %}
+    {%- endif -%}
+    {{-description_html|e-}}
+{% endblock %}
+
+{% block content %}
+    {%- for element in blog.posts %}
+    {%- endfor %}
+{% endblock %}

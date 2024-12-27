@@ -1,15 +1,16 @@
+import datetime
 import urllib.parse
 
 import sanic
 import sanic_ext
 
-from ... import priviblur_extractor
 from ...cache import get_blog_posts, get_blog_search_results
 
 blogs = sanic.Blueprint("blogs", url_prefix="/")
 
 
 @blogs.get("/")
+@blogs.get("rss", name="_blog_posts_rss", ctx_rss=True)
 async def _blog_posts(request: sanic.Request, blog: str):
     blog = urllib.parse.unquote(blog)
 
@@ -21,12 +22,28 @@ async def _blog_posts(request: sanic.Request, blog: str):
 
     blog = await get_blog_posts(request.app.ctx, blog, continuation=continuation, before_id=before_id)
 
+    if hasattr(request.route.ctx, "rss"):
+        template_path = "rss/blog/blog.xml.jinja"
+        render_args : dict = {"content_type": "application/rss+xml"}
+
+        context_args : dict = {}
+        if last_post := blog.posts[-1]:
+            context_args["updated"] = last_post.date
+        else:
+            context_args["updated"] = datetime.datetime.now(tz=datetime.timezone.utc)
+    else:
+        template_path = "blog/blog.jinja"
+        render_args : dict = {}
+        context_args : dict = {}
+
     return await sanic_ext.render(
-        "blog/blog.jinja",
+        template_path,
         context={
             "app": request.app,
             "blog": blog,
-        }
+            **context_args
+        },
+        **render_args
     )
 
 
