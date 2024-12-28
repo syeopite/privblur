@@ -1,0 +1,19 @@
+{% from 'post/components/header.jinja' import create_post_header  %}
+{% from 'macros/add_query.jinja' import add_query  %}
+{% set url = page_url %}
+{% extends "rss/base.xml.jinja" %}
+    {%- if query is defined -%}
+        {%- set title = query | e-%}
+    {%- elif tag is defined -%}
+        {%- set title = "#" + tag | e-%}
+    {%- else -%}
+        {%- set title = title | e-%}
+    {%- endif -%}
+{% block title %}{{title}}{% endblock %}
+{% block description %}{{title}}{% endblock %}
+{% block content %}
+    {%- for element in timeline.elements %}
+        {% set post = element %}
+        {%- include "rss/post.xml.jinja" -%}
+    {%- endfor -%}
+{% endblock %}
