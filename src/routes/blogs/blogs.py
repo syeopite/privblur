@@ -50,6 +50,7 @@ async def _blog_posts(request: sanic.Request, blog: str):
 # Tags
 
 @blogs.get("/tagged/<tag:str>")
+@blogs.get("/tagged/<tag:str>/rss", name="_blog_tags_rss", ctx_rss=True)
 async def _blog_tags(request: sanic.Request, blog: str, tag: str):
     blog = urllib.parse.unquote(blog)
     tag = urllib.parse.unquote(tag)
@@ -59,19 +60,36 @@ async def _blog_tags(request: sanic.Request, blog: str, tag: str):
 
     blog = await get_blog_posts(request.app.ctx, blog, continuation=continuation, tag=tag)
 
+    if hasattr(request.route.ctx, "rss"):
+        template_path = "rss/blog/blog.xml.jinja"
+        render_args : dict = {"content_type": "application/rss+xml"}
+
+        context_args : dict = {}
+        if last_post := blog.posts[-1]:
+            context_args["updated"] = last_post.date
+        else:
+            context_args["updated"] = datetime.datetime.now(tz=datetime.timezone.utc)
+    else:
+        template_path = "blog/blog.jinja"
+        context_args : dict = {}
+        render_args : dict = {}
+
     return await sanic_ext.render(
-        "blog/blog.jinja",
+        template_path,
         context={
             "app": request.app,
             "blog": blog,
             "tag": tag,
-        }
+            **context_args
+        },
+        **render_args
     )
 
 
 # Search
 
 @blogs.get("/search/<query:str>")
+@blogs.get("/search/<query:str>/rss", name="_blog_search_rss", ctx_rss=True)
 async def _blog_search(request: sanic.Request, blog: str, query: str):
     blog = urllib.parse.unquote(blog)
     query = urllib.parse.unquote(query)
@@ -81,13 +99,29 @@ async def _blog_search(request: sanic.Request, blog: str, query: str):
 
     blog = (await get_blog_search_results(request.app.ctx, blog, query, continuation=continuation))
 
+    if hasattr(request.route.ctx, "rss"):
+        template_path = "rss/blog/blog.xml.jinja"
+        render_args : dict = {"content_type": "application/rss+xml"}
+
+        context_args : dict = {}
+        if last_post := blog.posts[-1]:
+            context_args["updated"] = last_post.date
+        else:
+            context_args["updated"] = datetime.datetime.now(tz=datetime.timezone.utc)
+    else:
+        template_path = "blog/blog_search.jinja"
+        context_args : dict = {}
+        render_args : dict = {}
+
     return await sanic_ext.render(
-        "blog/blog_search.jinja",
+        template_path,
         context={
             "app": request.app,
             "blog": blog,
             "blog_search_query": query,
-        }
+            **context_args
+        },
+        **render_args
     )
 
 
