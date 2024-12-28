@@ -1,4 +1,4 @@
-import html
+import datetime
 import urllib.parse
 
 import sanic
@@ -20,9 +20,9 @@ async def query_param_redirect(request: sanic.Request):
 
 
 @search.get("/<query:str>")
+@search.get("/<query:str>/rss", name="_name_rss", ctx_rss=True)
 async def _main(request: sanic.Request, query: str):
     query = urllib.parse.unquote(query)
-    timeline_type = request.app.ctx.TumblrAPI.config.TimelineType
 
     time_filter = request.args.get("t")
     if not time_filter or time_filter not in ("365", "180", "30", "7", "1"):
@@ -34,6 +34,7 @@ async def _main(request: sanic.Request, query: str):
 
 
 @search.get("/<query:str>/recent")
+@search.get("/<query:str>/recent/rss", name="_sort_by_search_rss", ctx_rss=True)
 async def _sort_by_search(request: sanic.Request, query: str):
     query = urllib.parse.unquote(query)
     time_filter = request.args.get("t")
@@ -48,11 +49,13 @@ async def _sort_by_search(request: sanic.Request, query: str):
 
 
 @search.get("/<query:str>/<post_filter:str>")
+@search.get("/<query:str>/<post_filter:str>/rss", name="_filter_by_search_rss", ctx_rss=True)
 async def _filter_by_search(request: sanic.Request, query: str, post_filter: str):
     return await _request_search_filter_post(request, query, post_filter, latest=False)
 
 
 @search.get("/<query:str>/recent/<post_filter:str>")
+@search.get("/<query:str>/recent/<post_filter:str>/rss", name="_sort_by_and_filter_search_rss", ctx_rss=True)
 async def _sort_by_and_filter_search(request: sanic.Request, query: str, post_filter: str):
     return await _request_search_filter_post(request, query, post_filter, latest=True)
 
@@ -118,9 +121,41 @@ async def _render(request, timeline, query, **kwargs):
         del request.args["continuation"]
 
     context = {
-        "app": request.app, "timeline": timeline, "query_args": request.args, "query": query
+        "app": request.app,
+        "timeline": timeline,
+        "query_args": request.args,
+        "query": query
     }
 
     context.update(kwargs)
 
-    return await sanic_ext.render("search.jinja", context=context)
+    if hasattr(request.route.ctx, "rss"):
+        template_path = "rss/timeline.xml.jinja"
+        render_args : dict = {
+            "content_type": "application/rss+xml",
+        }
+        page_url = f"{request.app.ctx.PRIVIBLUR_CONFIG.deployment.domain or ""}/{
+            request.app.url_for(
+                request.endpoint,
+                query=urllib.parse.quote(query),
+                **kwargs
+            )
+        }"
+        if request.query_string:
+            page_url += f"?{request.query_string}"
+
+        context["page_url"] = page_url
+
+        if last_post := timeline.elements[-1]:
+            context["updated"] = last_post.date
+        else:
+            context["updated"] = datetime.datetime.now(tz=datetime.timezone.utc)
+    else:
+        template_path = "search.jinja"
+        render_args : dict = {}
+
+    return await sanic_ext.render(
+        template_path,
+        context=context,
+        **render_args
+    )
