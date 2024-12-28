@@ -2,32 +2,8 @@
 {% from 'macros/add_query.jinja' import add_query  %}
 {% extends "rss/blog/base_blog.xml.jinja" %}
 
-{% block content %}
-{% for post in blog.posts %}
-
-{%- set post_url = (request.app.ctx.PRIVIBLUR_CONFIG.deployment.domain or "") + "/" + post.blog.name|e + "/" + post.id | e -%}
-{%- if post.slug -%}
-    {%- set post_url = post_url + "/" + post.slug | e -%}
-{%- endif -%}
-
-<item>
-    <title>{{post.summary | e}}</title>
-    <link>{{post_url}}</link>
-    <atom:link rel="alternate" href="{{post_url}}"/>
-    <description>{% set element = post %}{% filter escape %}{%- include 'post/components/body.jinja' -%}{% endfilter %}</description>
-    <guid isPermaLink="false">{{post.id}}</guid>
-    <pubDate>{{post.date.strftime("%a, %d %b %Y %H:%M:%S %z")}}</pubDate>
-    {% if post.trail %}
-        {%- for trail in post.trail -%}
-            <atom:author>
-                <atom:name>{{trail.blog.name}}</atom:name>
-            </atom:author>
-        {%- endfor -%}
-    {%- endif -%}
-    {% if post.content %}<atom:author><atom:name>{{post.blog.name}}</atom:name></atom:author>{% endif %}
-    {% for tag in post.tags %}
-        <category>{{tag|e}}</category>
-    {% endfor %}
-</item>
-{% endfor %}
+{%- block content %}
+    {%- for post in blog.posts %}
+        {%- include "rss/post.xml.jinja" -%}
+    {%- endfor -%}
 {% endblock %}
