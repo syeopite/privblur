@@ -53,7 +53,7 @@ async def _handle_explore(request, endpoint, post_type = None):
         }
 
         context_args : dict = {
-            "page_url": f"{request.app.ctx.PRIVIBLUR_CONFIG.deployment.domain or ""}/{endpoint}"
+            "page_url": f"{request.app.ctx.PRIVIBLUR_CONFIG.deployment.domain or ''}/{endpoint}"
         }
         if last_post := timeline.elements[-1]:
             context_args["updated"] = last_post.date

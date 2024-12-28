@@ -36,7 +36,7 @@ async def _main(request: sanic.Request, tag: str):
         render_args : dict = {
             "content_type": "application/rss+xml",
         }
-        page_url = f"{request.app.ctx.PRIVIBLUR_CONFIG.deployment.domain or ""}/tagged/{urllib.parse.quote(tag)}"
+        page_url = f"{request.app.ctx.PRIVIBLUR_CONFIG.deployment.domain or ''}/tagged/{urllib.parse.quote(tag)}"
         if request.query_string:
             page_url += f"?{request.query_string}"
 

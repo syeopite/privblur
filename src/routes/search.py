@@ -134,13 +134,8 @@ async def _render(request, timeline, query, **kwargs):
         render_args : dict = {
             "content_type": "application/rss+xml",
         }
-        page_url = f"{request.app.ctx.PRIVIBLUR_CONFIG.deployment.domain or ""}/{
-            request.app.url_for(
-                request.endpoint,
-                query=urllib.parse.quote(query),
-                **kwargs
-            )
-        }"
+        search_url = request.app.url_for(request.endpoint, query=urllib.parse.quote(query), **kwargs)
+        page_url = f"{request.app.ctx.PRIVIBLUR_CONFIG.deployment.domain or ''}/{search_url}"
         if request.query_string:
             page_url += f"?{request.query_string}"
 
