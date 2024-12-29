@@ -1,10 +1,7 @@
-import datetime
 import urllib.parse
 
 import sanic
-import sanic_ext
 
-from .. import priviblur_extractor
 from ..cache import get_explore_results
 
 explore = sanic.Blueprint("explore", url_prefix="/explore")
@@ -46,33 +43,13 @@ async def _handle_explore(request, endpoint, post_type = None):
             )
             title = request.app.ctx.translate(request.ctx.language, "explore_trending_page_title")
 
-    if hasattr(request.route.ctx, "rss"):
-        template_path = "rss/timeline.xml.jinja"
-        render_args : dict = {
-            "content_type": "application/rss+xml",
-        }
-
-        context_args : dict = {
-            "page_url": f"{request.app.ctx.PRIVIBLUR_CONFIG.deployment.domain or ''}/{endpoint}"
-        }
-        if last_post := timeline.elements[-1]:
-            context_args["updated"] = last_post.date
-        else:
-            context_args["updated"] = datetime.datetime.now(tz=datetime.timezone.utc)
-    else:
-        template_path = "timeline.jinja"
-        context_args : dict = {}
-        render_args : dict = {}
-
-    return await sanic_ext.render(
-        template_path,
+    return await request.app.ctx.render(
+        "timeline",
         context={
             "app": app,
             "title": title,
             "timeline": timeline,
-            **context_args
         },
-        **render_args
     )
 
 
