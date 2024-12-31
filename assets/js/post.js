@@ -40,9 +40,9 @@ function fill_poll_results(poll_element, results) {
     }
     
     const answerIdChoiceElementArray = [];
-    const pollBody = poll_element.getElementsByClassName("poll-body")[0];
+    const pollChoices = poll_element.getElementsByClassName("poll-choices")[0];
 
-    for (let choiceElement of pollBody.children) {
+    for (let choiceElement of pollChoices.children) {
         answerIdChoiceElementArray.push([choiceElement.dataset.answerId, choiceElement]);
     }
 
@@ -63,7 +63,7 @@ function fill_poll_results(poll_element, results) {
         voteProportionElement.classList.add("vote-proportion");
         voteProportionElement["style"] = `width: ${((numericalVoteProportion) * 100).toFixed(3)}%;`;
 
-        const voteCountElement = document.createElement("span");
+        const voteCountElement = document.createElement("p");
         voteCountElement.classList.add("vote-count");
 
         // A greater rounding precision is needed here
