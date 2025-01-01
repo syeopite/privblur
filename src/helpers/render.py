@@ -35,6 +35,8 @@ def render_template(
             jinja_context["updated"] = elements.posts[-1].date
         elif (elements := jinja_context.get("timeline")) and elements.elements:
             jinja_context["updated"] = elements.elements[-1].date
+        elif (elements := jinja_context.get("notes")) and elements.notes:
+            jinja_context["updated"] = elements.notes[-1].date
         else:
             jinja_context["updated"] = datetime.datetime.now(tz=datetime.timezone.utc)
 

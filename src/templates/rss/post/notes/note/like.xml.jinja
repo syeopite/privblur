@@ -1,0 +1,16 @@
+<item>
+    <title>{{note.blog_name | e}} Liked</title>
+    <link>{{page_url}}?note_viewer=likes</link>
+    <description>
+    {% filter escape %}
+        <img src="{{url_handler(note.avatar["128"])}}" loading="lazy"/>
+        <p>{{note.blog_name | e}} Liked</p>
+    {% endfilter %}
+    </description>
+    <pubDate>{{note.date.strftime("%a, %d %b %Y %H:%M:%S %z")}}</pubDate>
+    <guid isPermaLink="false">{{note.blog_uuid}}</guid>
+    <atom:author>
+        <atom:name>{{note.blog_name}}</atom:name>
+        <atom:uri>/{{note.blog_name}}</atom:uri>
+    </atom:author>
+</item>

@@ -1,0 +1,28 @@
+<item>
+    <title>{{note.blog.name | e}} replied </title>
+    <link>{{page_url}}?note_viewer=replies</link>
+    <description>
+        {%- filter escape -%}
+            {%- if note.blog.active -%}
+                <a href="/{{note.blog.name}}"><img class="avatar" alt="{{translate(request.ctx.language, "blog_avatar_alt")}}" loading="lazy" src="{{url_handler(note.blog.avatar[-1].url)}}"></a>
+            {%- else -%}
+                <img class="avatar" alt="{{translate(request.ctx.language, "blog_avatar_alt")}}" loading="lazy" src="/assets/images/anon_96px.png?v=1">
+            {% endif %}
+
+            {%- set contains_errors, content_tag = format_npf(
+                        note.content,
+                        note.layout,
+                        note.blog.name,
+                        note.id,
+                    )
+            -%}
+            {{-content_tag-}}
+        {% endfilter %}
+    </description>
+    <pubDate>{{note.date.strftime("%a, %d %b %Y %H:%M:%S %z")}}</pubDate>
+    <guid isPermaLink="false">{{note.uuid}}</guid>
+    <atom:author>
+        <atom:name>{{note.blog.name}}</atom:name>
+        <atom:uri>/{{note.blog.name}}</atom:uri>
+    </atom:author>
+</item>
