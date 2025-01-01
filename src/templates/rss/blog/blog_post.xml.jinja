@@ -1,0 +1,7 @@
+{% extends "rss/blog/base_blog.xml.jinja" %}
+{% block feed_rss_link %}"{{post_url}}rss_feed=1"{% endblock %}
+
+{%- block content %}
+    {% set post = element %}
+    {%- include "rss/post.xml.jinja" -%}
+{% endblock %}

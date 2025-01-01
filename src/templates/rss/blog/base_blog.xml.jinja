@@ -1,13 +1,12 @@
 {% from 'post/components/header.jinja' import create_post_header  %}
 {% from 'macros/add_query.jinja' import add_query  %}
-{% set url = ((request.app.ctx.PRIVIBLUR_CONFIG.deployment.domain or "") + "/" + blog.blog_info.name)%}
 {% extends "rss/base.xml.jinja" %}
 {% block title %}{{blog.blog_info.name | e}}{% endblock %}
 {% block logo %}
     <image>
         <url>{{url_handler(blog.blog_info.avatar[-2].url)}}</url>
         <title>{{translate(request.ctx.language, "blog_avatar_alt")}}</title>
-        <link>{{url}}</link>
+        <link>{{page_url}}</link>
     </image>
     <atom:logo><atom:icon>{{url_handler(blog.blog_info.avatar[-2].url)}}</atom:icon></atom:logo>
 {% endblock %}

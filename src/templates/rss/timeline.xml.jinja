@@ -1,6 +1,5 @@
 {% from 'post/components/header.jinja' import create_post_header  %}
 {% from 'macros/add_query.jinja' import add_query  %}
-{% set url = page_url %}
 {% extends "rss/base.xml.jinja" %}
     {%- if query is defined -%}
         {%- set title = query | e-%}

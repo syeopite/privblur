@@ -90,8 +90,12 @@ async def _blog_post(request: sanic.Request, **kwargs):
     else:
         fetch_poll_results = False
 
-    return await sanic_ext.render(
-        "blog/blog_post.jinja",
+    if (rss_feed := request.args.get("rss_feed")) and sanic.utils.str_to_bool(rss_feed):
+        request.ctx.rss = True
+        request.ctx.page_url = f"{request.app.ctx.PRIVIBLUR_CONFIG.deployment.domain or ''}{post_url}"
+
+    return await request.app.ctx.render(
+        "blog/blog_post",
         context={
             "app": request.app,
             "blog": blog_info,

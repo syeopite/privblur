@@ -6,6 +6,7 @@
 <item>
     <title>{{post.summary | e}}</title>
     <link>{{post_url}}</link>
+    <atom:link rel="self" href="{{post_url}}?rss_feed=1" type="application/rss+xml"/>
     <atom:link rel="alternate" href="{{post_url}}"/>
     <description>{% set element = post %}{% filter escape %}{%- include 'post/components/body.jinja' -%}{% endfilter %}</description>
     <guid isPermaLink="false">{{post.id}}</guid>
