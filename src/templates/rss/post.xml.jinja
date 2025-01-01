@@ -22,4 +22,5 @@
     {% for tag in post.tags %}
         <category>{{tag|e}}</category>
     {% endfor %}
+    <comments>{{post_url}}?note_viewer={{post.default_note_viewer_tab}}</comments>
 </item>
