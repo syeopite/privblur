@@ -11,8 +11,11 @@ def render_template(
     **kwargs
 ):
     jinja_context = context or {}
+    # Append additional context
 
     request = sanic.Request.get_current()
+
+    jinja_context.update(getattr(request.ctx, "breq_jinja_context", {}))
 
     if hasattr(request.route.ctx, "rss") or hasattr(request.ctx, "rss"):
         template = getattr(request.route.ctx, "template", None) or template
