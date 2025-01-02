@@ -1,7 +1,7 @@
 import dataclasses
 import urllib.parse
 
-from .helpers.i18n import SUPPORTED_LANGUAGES
+from .i18n import SUPPORTED_LANGUAGES
 
 VERSION = 1
 

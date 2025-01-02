@@ -1,0 +1,84 @@
+# Copyright (C) 2023 Syeopite
+# This file is distributed under the same license as the Priviblur project.
+# syeopite <syeopite@syeopite.dev>, 2023
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Priviblur v0.3.0-dev\n"
+"Report-Msgid-Bugs-To: https://github.com/syeopite/priviblur/issues\n"
+"POT-Creation-Date: 2023-11-16 00:07-0800\n"
+"PO-Revision-Date: 2024-06-29 04:09+0000\n"
+"Last-Translator: syeopite <syeopite@users.noreply.hosted.weblate.org>\n"
+"Language-Team: English <https://hosted.weblate.org/projects/priviblur/"
+"translations/en/>\n"
+"Language: en\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=n != 1;\n"
+"X-Generator: Weblate 5.7-dev\n"
+
+msgid "asker_with_no_attribution"
+msgstr "Anonymous"
+
+msgid "asker_and_ask_verb"
+msgstr "{name} asked"
+
+msgid "unsupported_block_header"
+msgstr "Unsupported NPF block"
+
+msgid "unsupported_block_description"
+msgstr "Placeholder for the unsupported \"{block}\" type NPF block Please report me over at https://github.com/syeopite/npf-renderer"
+
+msgid "generic_image_alt_text"
+msgstr "image"
+
+msgid "link_block_poster_alt_text"
+msgstr "Preview image for \"{site}\""
+
+msgid "link_block_fallback_embeds_are_disabled"
+msgstr "Embeds are disabled"
+
+msgid "error_video_link_block_fallback_heading"
+msgstr "Error: unable to render video block"
+
+msgid "video_link_block_fallback_description"
+msgstr "Please click me to watch on the original site"
+
+msgid "error_link_block_fallback_native_video_player_non_tumblr_source"
+msgstr "Error: non-tumblr source for video player"
+
+msgid "fallback_audio_block_thumbnail_alt_text"
+msgstr "Album art"
+
+msgid "error_audio_link_block_fallback_heading"
+msgstr "Error: unable to render audio block"
+
+msgid "audio_link_block_fallback_description"
+msgstr "Please click me to listen on the original site"
+
+msgid "error_link_block_fallback_native_audio_player_non_tumblr_source"
+msgstr "Error: non-tumblr source for audio player"
+
+msgid "poll_total_votes"
+msgid_plural "poll_total_votes_plural"
+msgstr[0] "{votes} vote"
+msgstr[1] "{votes} votes"
+
+msgid "poll_remaining_time"
+msgstr "{duration} remaining"
+
+msgid "poll_ended_on"
+msgstr "Ended on: {ended_date}"
+
+msgid "post_attribution"
+msgstr "From {0}"
+
+msgid "blog_attribution"
+msgstr "Created by {0}"
+
+msgid "app_attribution"
+msgstr "View on {0}"
+
+msgid "unsupported_attribution"
+msgstr "Attributed via an unsupported (\"{0}\") attribution type. Please report this over at https://github.com/syeopite/npf-renderer"

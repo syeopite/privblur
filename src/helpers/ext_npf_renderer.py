@@ -123,6 +123,7 @@ class NPFFormatter(npf_renderer.format.Formatter):
         if request:
             # Asking to expand a post is the reverse of asking to truncate a post
             initialization_arguments["truncate"] = not request.ctx.preferences.expand_posts
+            initialization_arguments["localizer"] = request.app.ctx.LANGUAGES[request.ctx.language].npf_renderer_localizer
 
         super().__init__(**initialization_arguments)
 
