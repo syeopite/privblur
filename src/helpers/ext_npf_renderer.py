@@ -102,8 +102,30 @@ class NPFParser(npf_renderer.parse.Parser):
 
 
 class NPFFormatter(npf_renderer.format.Formatter):
-    def __init__(self, content, layout=None, blog_name=None, post_id=None, *, url_handler=None, forbid_external_iframes=False):
-        super().__init__(content, layout, url_handler=url_handler, forbid_external_iframes=forbid_external_iframes)
+    def __init__(
+        self,
+        content,
+        layout=None,
+        *,
+        blog_name=None,
+        post_id=None,
+        url_handler=None,
+        forbid_external_iframes=False,
+        request=None,
+    ):
+        initialization_arguments = {
+            "content": content,
+            "layout": layout,
+            "url_handler": url_handler,
+            "forbid_external_iframes": forbid_external_iframes
+        }
+
+        if request:
+            # Asking to expand a post is the reverse of asking to truncate a post
+            initialization_arguments["truncate"] = not request.ctx.preferences.expand_posts
+            initialization_arguments["localizer"] = request.app.ctx.LANGUAGES[request.ctx.language].npf_renderer_localizer
+
+        super().__init__(**initialization_arguments)
 
         # We store the blog and post ID as to be able to render a link to
         # fetch poll results for JS disabled users
@@ -114,9 +136,9 @@ class NPFFormatter(npf_renderer.format.Formatter):
         poll_html = super()._format_poll(block)
         poll_html["data-poll-id"] = block.poll_id
 
-        poll_body = poll_html[1]
+        poll_choices = poll_html[1][0]
         for index, answer_id in enumerate(block.answers.keys()):
-            poll_body[index]["data-answer-id"] = answer_id
+            poll_choices[index]["data-answer-id"] = answer_id
 
         if (self.blog_name and self.post_id) and not block.votes:
             poll_footer = poll_html[2]
@@ -171,7 +193,14 @@ class NPFFormatter(npf_renderer.format.Formatter):
             )
 
 
-async def format_npf(contents, layouts=None, blog_name=None, post_id=None,*, poll_callback=None):
+async def format_npf(
+    contents,
+    layouts=None,
+    blog_name=None,
+    post_id=None,*,
+    poll_callback=None,
+    request=None
+):
     """Wrapper around npf_renderer.format_npf for extra functionalities
 
     - Replaces internal Parser and Formatter with the modified variants above
@@ -183,6 +212,8 @@ async def format_npf(contents, layouts=None, blog_name=None, post_id=None,*, pol
             Name of the blog the post comes from. This is used to render links to the parent post
         post_id:
             Unique ID of the post. This is used to render links to the parent post
+        request:
+            Sanic request object. Used to check user preferences
     """
     try:
         contents = await NPFParser(contents, poll_callback=poll_callback).parse()
@@ -197,6 +228,7 @@ async def format_npf(contents, layouts=None, blog_name=None, post_id=None,*, pol
             post_id=post_id,
             url_handler=url_handler,
             forbid_external_iframes=True,
+            request=request
         ).format()
 
     except npf_renderer.exceptions.RenderErrorDisclaimerError as e:

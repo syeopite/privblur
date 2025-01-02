@@ -7,10 +7,38 @@
 
 .post-body > .text-block:last-child,
 .post-body > .layout-row:last-child > .text-block:last-child,
+.post-body > .layout-truncated:last-child > .text-block:last-child,
 .post-body > .link-block:last-child,
-.post-body > .layout-row:last-child > .link-block:last-child {
+.post-body > .layout-row:last-child > .link-block:last-child
+.post-body > .layout-truncated:last-child > .text-block:last-child {
   margin-bottom: 0;
 }
+
+.layout-row {
+  margin: 0;
+}
+
+.layout-truncated > summary {
+  color: var(--color-post-reveal-truncated-content-button);
+  list-style: none;
+  font-weight: 650;
+  cursor: pointer;
+  text-decoration: underline;
+  display: inline-block;
+
+  position: relative;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.layout-truncated > summary:hover {
+  color: var(--color-post-reveal-truncated-content-button-hover);
+}
+
+.layout-truncated[open=""] > summary {
+  display: none;
+}
+
 
 .heading1, .heading2, .quote {
   font-weight: 500;

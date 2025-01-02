@@ -12,10 +12,10 @@ import babel.lists
 import redis.asyncio
 from npf_renderer import VERSION as NPF_RENDERER_VERSION
 
-from . import routes, priviblur_extractor, preferences
+from . import routes, priviblur_extractor, preferences, i18n
 from .exceptions import error_handlers
 from .config import load_config
-from .helpers import setup_logging, helpers, i18n, ext_npf_renderer
+from .helpers import setup_logging, helpers, ext_npf_renderer
 from .version import VERSION, CURRENT_COMMIT
 
 

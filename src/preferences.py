@@ -1,7 +1,7 @@
 import dataclasses
 import urllib.parse
 
-from .helpers.i18n import SUPPORTED_LANGUAGES
+from .i18n import SUPPORTED_LANGUAGES
 
 VERSION = 1
 
@@ -10,6 +10,8 @@ class UserPreferences:
     # See DefaultUserPreferences in config/user_preferences.py
     language: str
     theme: str
+
+    expand_posts: bool
 
     # Tracks major revisions of the settings cookie
     # Only bump in case of breaking changes.
