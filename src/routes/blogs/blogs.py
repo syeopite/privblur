@@ -1,15 +1,14 @@
 import urllib.parse
 
 import sanic
-import sanic_ext
 
-from ... import priviblur_extractor
 from ...cache import get_blog_posts, get_blog_search_results
 
 blogs = sanic.Blueprint("blogs", url_prefix="/")
 
 
 @blogs.get("/")
+@blogs.get("rss", name="_blog_posts_rss", ctx_rss=True)
 async def _blog_posts(request: sanic.Request, blog: str):
     blog = urllib.parse.unquote(blog)
 
@@ -21,18 +20,19 @@ async def _blog_posts(request: sanic.Request, blog: str):
 
     blog = await get_blog_posts(request.app.ctx, blog, continuation=continuation, before_id=before_id)
 
-    return await sanic_ext.render(
-        "blog/blog.jinja",
+    return await request.app.ctx.render(
+        "blog/blog",
         context={
             "app": request.app,
             "blog": blog,
-        }
+        },
     )
 
 
 # Tags
 
 @blogs.get("/tagged/<tag:str>")
+@blogs.get("/tagged/<tag:str>/rss", name="_blog_tags_rss", ctx_rss=True)
 async def _blog_tags(request: sanic.Request, blog: str, tag: str):
     blog = urllib.parse.unquote(blog)
     tag = urllib.parse.unquote(tag)
@@ -42,19 +42,20 @@ async def _blog_tags(request: sanic.Request, blog: str, tag: str):
 
     blog = await get_blog_posts(request.app.ctx, blog, continuation=continuation, tag=tag)
 
-    return await sanic_ext.render(
-        "blog/blog.jinja",
+    return await request.app.ctx.render(
+        "blog/blog",
         context={
             "app": request.app,
             "blog": blog,
             "tag": tag,
-        }
+        },
     )
 
 
 # Search
 
 @blogs.get("/search/<query:str>")
+@blogs.get("/search/<query:str>/rss", name="_blog_search_rss", ctx_rss=True)
 async def _blog_search(request: sanic.Request, blog: str, query: str):
     blog = urllib.parse.unquote(blog)
     query = urllib.parse.unquote(query)
@@ -64,13 +65,13 @@ async def _blog_search(request: sanic.Request, blog: str, query: str):
 
     blog = (await get_blog_search_results(request.app.ctx, blog, query, continuation=continuation))
 
-    return await sanic_ext.render(
-        "blog/blog_search.jinja",
+    return await request.app.ctx.render(
+        "blog/blog_search",
         context={
             "app": request.app,
             "blog": blog,
             "blog_search_query": query,
-        }
+        },
     )
 
 

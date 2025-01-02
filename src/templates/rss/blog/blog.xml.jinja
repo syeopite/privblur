@@ -1,0 +1,7 @@
+{% extends "rss/blog/base_blog.xml.jinja" %}
+
+{%- block content %}
+    {%- for post in blog.posts %}
+        {%- include "rss/post.xml.jinja" -%}
+    {%- endfor -%}
+{% endblock %}

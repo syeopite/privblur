@@ -1,11 +1,8 @@
-import html
 import urllib.parse
 
 import sanic
-import sanic_ext
 
 from ..cache import get_search_results
-from .. import priviblur_extractor
 
 search = sanic.Blueprint("search", url_prefix="/search")
 
@@ -20,9 +17,9 @@ async def query_param_redirect(request: sanic.Request):
 
 
 @search.get("/<query:str>")
+@search.get("/<query:str>/rss", name="_main_rss", ctx_rss=True, ctx_template="timeline")
 async def _main(request: sanic.Request, query: str):
     query = urllib.parse.unquote(query)
-    timeline_type = request.app.ctx.TumblrAPI.config.TimelineType
 
     time_filter = request.args.get("t")
     if not time_filter or time_filter not in ("365", "180", "30", "7", "1"):
@@ -34,6 +31,7 @@ async def _main(request: sanic.Request, query: str):
 
 
 @search.get("/<query:str>/recent")
+@search.get("/<query:str>/recent/rss", name="_sort_by_search_rss", ctx_rss=True, ctx_template="timeline")
 async def _sort_by_search(request: sanic.Request, query: str):
     query = urllib.parse.unquote(query)
     time_filter = request.args.get("t")
@@ -48,11 +46,13 @@ async def _sort_by_search(request: sanic.Request, query: str):
 
 
 @search.get("/<query:str>/<post_filter:str>")
+@search.get("/<query:str>/<post_filter:str>/rss", name="_filter_by_search_rss", ctx_rss=True, ctx_template="timeline")
 async def _filter_by_search(request: sanic.Request, query: str, post_filter: str):
     return await _request_search_filter_post(request, query, post_filter, latest=False)
 
 
 @search.get("/<query:str>/recent/<post_filter:str>")
+@search.get("/<query:str>/recent/<post_filter:str>/rss", name="_sort_by_and_filter_search_rss", ctx_rss=True, ctx_template="timeline")
 async def _sort_by_and_filter_search(request: sanic.Request, query: str, post_filter: str):
     return await _request_search_filter_post(request, query, post_filter, latest=True)
 
@@ -111,6 +111,7 @@ async def _query_search(request, query, **kwargs):
 
     return await get_search_results(request.app.ctx, query, continuation, **kwargs)
 
+
 async def _render(request, timeline, query, **kwargs):
     # We remove the continuation parameter used to fetch this page as to ensure the current continuation parameter isn't
     # added when applying a search filter
@@ -118,9 +119,14 @@ async def _render(request, timeline, query, **kwargs):
         del request.args["continuation"]
 
     context = {
-        "app": request.app, "timeline": timeline, "query_args": request.args, "query": query
+        "app": request.app,
+        "timeline": timeline,
+        "query_args": request.args,
+        "query": query
     }
 
     context.update(kwargs)
 
-    return await sanic_ext.render("search.jinja", context=context)
+    return await request.app.ctx.render(
+        "search", context=context,
+    )

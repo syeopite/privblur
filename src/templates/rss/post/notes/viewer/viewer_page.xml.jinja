@@ -1,0 +1,7 @@
+{% extends "rss/base.xml.jinja" %}
+{% block title %}{{note_type}} of {{post_url}}{% endblock %}
+{% block description %}{{note_type}} of {{post_url}}{% endblock %}
+{%block feed_rss_link%}"{{page_url}}?note_viewer={{note_type}}&rss_feed=1"{%endblock%}
+{% block content %}
+    {%- include "rss/post/notes/viewer/" + note_type + ".xml.jinja" %}
+{% endblock %}

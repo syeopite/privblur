@@ -1,5 +1,7 @@
 {% extends "base.jinja" %}
 {% from 'macros/insert_content_list.jinja' import insert_content_list with context %}
+{% from 'macros/add_query.jinja' import add_query  %}
+{% block head %}<link rel="alternate" type="application/rss+xml" href="{{request.path}}/rss{{add_query(request.query_string)}}"/>{% endblock %}
 {% block title %}{{title}}{% endblock%}
 
 {% block center %}

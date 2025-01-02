@@ -1,0 +1,26 @@
+<item>
+    <title>{{note.blog.name | e}} Reblogged</title>
+    <link>/{{note.blog.name}}/{{note.id}}</link>
+    <description>
+        {% set element = note %}
+
+        {%- if element.blog.active -%}
+            <a href="/{{element.blog.name}}"><img src="{{url_handler(element.blog.avatar[-1].url)}}"></a>
+        {%- else -%}
+            <img src="/assets/images/anon_96px.png?v=1">
+        {% endif %}
+
+        {% filter escape %}
+            <img src="{{url_handler(element.blog.avatar[-1].url)}}" loading="lazy"/>
+            {%- include 'post/components/body.jinja' -%}
+            {%- include 'post/components/tags.jinja'  -%}
+        {% endfilter %}
+    </description>
+    <pubDate>{{note.date.strftime("%a, %d %b %Y %H:%M:%S %z")}}</pubDate>
+    <guid isPermaLink="false">{{note.uuid}}</guid>
+    <atom:author>
+        <atom:name>{{note.blog_name}}</atom:name>
+        <atom:uri>/{{note.blog_name}}</atom:uri>
+    </atom:author>
+    {% for tag in note.tags %}<category>{{tag|e}}</category>{% endfor %}
+</item>

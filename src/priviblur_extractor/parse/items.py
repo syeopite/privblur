@@ -180,7 +180,7 @@ class PostParser:
 
             if (trail_post_data := trail_post.get("post")) and not is_broken_trail:
                 trail_post_id = trail_post_data["id"]
-                trail_post_creation_date = datetime.datetime.fromtimestamp(trail_post_data["timestamp"])
+                trail_post_creation_date = datetime.datetime.fromtimestamp(trail_post_data["timestamp"], tz=datetime.timezone.utc)
             else:
                 trail_post_id = None
                 trail_post_creation_date = None
@@ -224,7 +224,7 @@ class PostParser:
             is_advertisement=is_advertisement,
             post_url=self.target["postUrl"],
             slug=self.target["slug"],
-            date=datetime.datetime.fromtimestamp(self.target["timestamp"]),
+            date=datetime.datetime.fromtimestamp(self.target["timestamp"], tz=datetime.timezone.utc),
             tags=self.target["tags"],
             summary=self.target["summary"],
 
@@ -261,7 +261,7 @@ class ReplyNoteParser:
         return models.post.ReplyNote(
             uuid=self.target["id"],
             reply_id=self.target["replyId"],
-            date=datetime.datetime.fromtimestamp(self.target["timestamp"]),
+            date=datetime.datetime.fromtimestamp(self.target["timestamp"], tz=datetime.timezone.utc),
 
             content=self.target["content"],
             layout=self.target["layout"],
@@ -294,7 +294,7 @@ class ReblogNoteParser:
             tags=self.target["tags"],
 
             reblogged_from=self.target["reblogParentBlogName"],
-            date=datetime.datetime.fromtimestamp(self.target["timestamp"]),   
+            date=datetime.datetime.fromtimestamp(self.target["timestamp"], tz=datetime.timezone.utc),
             community_labels=PostParser.parse_community_label(self.target),
         )
 
@@ -324,7 +324,7 @@ class ReblogNoteParser:
             tags=self.target["tags"],
 
             reblogged_from=self.target["reblogParentBlogName"],
-            date=datetime.datetime.fromtimestamp(self.target["timestamp"]),
+            date=datetime.datetime.fromtimestamp(self.target["timestamp"], tz=datetime.timezone.utc),
             community_labels=[],
         )
 
@@ -343,7 +343,7 @@ class LikeNoteParser:
             blog_name=self.target["blogName"],
             blog_uuid=self.target["blogUuid"],
             blog_title=self.target["blogTitle"],
-            date=datetime.datetime.fromtimestamp(self.target["timestamp"]),
+            date=datetime.datetime.fromtimestamp(self.target["timestamp"], tz=datetime.timezone.utc),
             avatar=self.target["avatarUrl"],
         )
 

@@ -15,7 +15,7 @@ from npf_renderer import VERSION as NPF_RENDERER_VERSION
 from . import routes, priviblur_extractor, preferences
 from .exceptions import error_handlers
 from .config import load_config
-from .helpers import setup_logging, helpers, i18n, ext_npf_renderer
+from .helpers import setup_logging, helpers, render, i18n, ext_npf_renderer
 from .version import VERSION, CURRENT_COMMIT
 
 
@@ -125,6 +125,8 @@ async def initialize(app):
             app.ctx.CacheDb = None
     else:
         app.ctx.CacheDb = None
+
+    app.ctx.render = render.render_template
 
     # Add additional jinja filters and functions
 

@@ -1,16 +1,14 @@
-import html
 import urllib.parse
 
 import sanic
-import sanic_ext
 
-from .. import priviblur_extractor
 from ..cache import get_tag_browse_results
 
 tagged = sanic.Blueprint("tagged", url_prefix="/tagged")
 
 
 @tagged.get("/<tag:str>")
+@tagged.get("/<tag:str>/rss", name="_main_rss", ctx_rss=True, ctx_template="timeline")
 async def _main(request: sanic.Request, tag: str):
     tag = urllib.parse.unquote(tag)
     sort_by = request.args.get("sort")
@@ -31,13 +29,13 @@ async def _main(request: sanic.Request, tag: str):
     if request.args.get("continuation"):
         del request.args["continuation"]
 
-    return await sanic_ext.render(
-        "tagged.jinja",
+    return await request.app.ctx.render(
+        "tagged",
         context={
             "app": request.app,
             "query_args": request.args,
             "timeline": timeline,
             "tag": tag,
-            "sort_by": sort_by
-        }
+            "sort_by": sort_by,
+        },
     )

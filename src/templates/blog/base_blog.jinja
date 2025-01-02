@@ -2,6 +2,7 @@
 {% block head %}
 <link rel="preload" href="/assets/css/blog.css?v={{app.ctx.CURRENT_COMMIT}}" as="style">
 <link rel="stylesheet" type="text/css" href="/assets/css/blog.css?v={{app.ctx.CURRENT_COMMIT}}">
+{%- block child_block_include -%}{%- endblock -%}
 {% endblock %}
 {% block title -%}
     {%- if blog.blog_info.title -%}

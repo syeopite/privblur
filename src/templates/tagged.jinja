@@ -1,6 +1,5 @@
 {% extends "timeline.jinja" %}
 {% from 'components/icons/expand.jinja' import dropdown_icon  %}
-{% from 'macros/add_query.jinja' import add_query  %}
 {% block title %}{{tag | e}}{% endblock %}
 {% block control_bar %}
     <li class="control-bar-action no-js" id="sort-by-filter" title="{{translate(request.ctx.language, "timeline_tagged_sort_by_filter_title")}}"><span>{{translate(request.ctx.language, "timeline_tagged_sort_by_filter_" + sort_by)}}{{dropdown_icon(16,16)}}</span>

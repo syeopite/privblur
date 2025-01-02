@@ -2,6 +2,7 @@ import enum
 import urllib.parse
 
 import sanic
+from sanic import request
 import sanic_ext
 
 from ... import cache, priviblur_extractor
@@ -16,18 +17,15 @@ class PostNoteTypes(enum.Enum):
 
 def get_blog_post_path(request):
     """Returns the path to the user requested blog post endpoint"""
-    return f"/{'/'.join(str(path_component) for path_component in request.match_info.values())}"
+    post_path = f"/{'/'.join(str(path_component) for path_component in request.match_info.values())}"
+    if request.query_string:
+        post_path += f"?{request.query_string}"
 
-
-def get_post_url(blog, post_id, slug = None):
-    if slug:
-        return urllib.parse.quote(f"{blog}/{post_id}/{slug}")
-    else:
-        return urllib.parse.quote(f"{blog}/{post_id}/")
+    return post_path
 
 
 @blog_post_bp.on_request
-async def before_blog_post_request(request):
+async def handle_post_slug(request):
     """Validates that the user requested endpoint contains a valid slug
 
     Redirects to a valid URL if otherwise
@@ -54,18 +52,40 @@ async def before_blog_post_request(request):
                 request.match_info["slug"] = post.slug
                 return sanic.redirect(get_blog_post_path(request))
     elif post.slug:
-        # If the post has a slug but a slug is not given then we'll need to redirect
-        # the user to a path with the slug due to how Tumblr works.
+        request.match_info["slug"] = post.slug
+        return sanic.redirect(get_blog_post_path(request))
 
-        current_path = [str(path_component) for path_component in request.match_info.values()]
-
-        # Current path is `/<blog>/<post_id>/*`
-        # as such the slug needs to be inserted at position 2
-        current_path.insert(2, post.slug)
-
-        return sanic.redirect(f"/{'/'.join(current_path)}")
-
+    request.ctx.post_path = request.path
     request.ctx.parsed_post = post
+
+
+@blog_post_bp.on_request
+async def handle_post_args(request):
+    request.ctx.breq_jinja_context = jinja_context = {
+        "post_url": request.ctx.post_path[1:]
+    }
+
+    args = request.args
+
+    if (fetch_polls := args.get("fetch_polls")) and sanic.utils.str_to_bool(fetch_polls):
+        jinja_context["request_poll_data"] = True
+    else:
+        jinja_context["request_poll_data"] = False
+
+    if (rss_feed := args.get("rss_feed")) and sanic.utils.str_to_bool(rss_feed):
+        request.ctx.rss = True
+        request.ctx.page_url = f"{request.app.ctx.PRIVIBLUR_CONFIG.deployment.domain or ''}{request.ctx.post_path}"
+
+    # Requesting post notes?
+    if note_type := args.get("note_viewer"):
+        note_type = getattr(PostNoteTypes, note_type.upper(), None)
+        match note_type:
+            case PostNoteTypes.REPLIES:
+                return await _blog_post_replies(request, **request.match_info)
+            case PostNoteTypes.REBLOGS:
+                return await blog_post_reblog_notes(request, **request.match_info)
+            case PostNoteTypes.LIKES:
+                return await blog_post_like_notes(request, **request.match_info)
 
 
 @blog_post_bp.get("/")
@@ -83,21 +103,12 @@ async def _blog_post(request: sanic.Request, **kwargs):
             case PostNoteTypes.LIKES:
                 return await blog_post_like_notes(request, **kwargs)
 
-    post_url = get_post_url(**kwargs)
-
-    if request.args.get("fetch_polls") in ("1", "true"):
-        fetch_poll_results = True
-    else:
-        fetch_poll_results = False
-
-    return await sanic_ext.render(
-        "blog/blog_post.jinja",
+    return await request.app.ctx.render(
+        "blog/blog_post",
         context={
             "app": request.app,
             "blog": blog_info,
-            "post_url": post_url,
             "element": request.ctx.parsed_post,
-            "request_poll_data" : fetch_poll_results,
         }
     )
 
@@ -106,8 +117,6 @@ async def _blog_post_replies(request: sanic.Request, blog: str, post_id: str, **
     blog = urllib.parse.unquote(blog)
     if slug := kwargs.get("slug"):
         slug = urllib.parse.unquote(slug)
-
-    post_url = get_post_url(blog, post_id, slug)
 
     args = request.get_args(keep_blank_values=True)
 
@@ -133,14 +142,13 @@ async def _blog_post_replies(request: sanic.Request, blog: str, post_id: str, **
             latest=latest
         )
 
-    return await sanic_ext.render(
-        "post/notes/viewer/viewer_page.jinja",
+    return await request.app.ctx.render(
+        "post/notes/viewer/viewer_page",
         context={
             "app": request.app,
             "blog_info": request.ctx.parsed_post.blog,
             "post_id": str(post_id),
             "latest": latest,
-            "post_url": post_url,
             "note_type": "replies",
             "notes": parsed_notes
         }
@@ -151,8 +159,6 @@ async def blog_post_reblog_notes(request: sanic.Request, blog: str, post_id: str
     blog = urllib.parse.unquote(blog)
     if slug := kwargs.get("slug"):
         slug = urllib.parse.unquote(slug)
-
-    post_url = get_post_url(blog, post_id, slug)
 
     args_to_tumblr_api_wrapper = {}
 
@@ -200,13 +206,12 @@ async def blog_post_reblog_notes(request: sanic.Request, blog: str, post_id: str
         )
 
 
-    return await sanic_ext.render(
-        "post/notes/viewer/viewer_page.jinja",
+    return await request.app.ctx.render(
+        "post/notes/viewer/viewer_page",
         context={
             "app": request.app,
             "blog_info": request.ctx.parsed_post.blog,
             "post_id": str(post_id),
-            "post_url": post_url,
             "note_type": "reblogs",
             "reblog_filter": reblog_filter,
             "notes": parsed_notes
@@ -219,8 +224,6 @@ async def blog_post_like_notes(request: sanic.Request, blog: str, post_id: str, 
     if slug := kwargs.get("slug"):
         slug = urllib.parse.unquote(slug)
 
-    post_url = get_post_url(blog, post_id, slug)
-
     parsed_notes = await cache.get_post_notes(
         request.app.ctx,
         blog,
@@ -230,13 +233,12 @@ async def blog_post_like_notes(request: sanic.Request, blog: str, post_id: str, 
         before_timestamp=request.args.get("before_timestamp"),
     )
 
-    return await sanic_ext.render(
-        "post/notes/viewer/viewer_page.jinja",
+    return await request.app.ctx.render(
+        "post/notes/viewer/viewer_page",
         context={
             "app": request.app,
             "blog_info": request.ctx.parsed_post.blog,
             "post_id": str(post_id),
-            "post_url": post_url,
             "note_type": "likes",
             "notes": parsed_notes
         }

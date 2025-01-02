@@ -1,5 +1,8 @@
 {% extends "blog/base_blog.jinja" %}
 {% from 'macros/add_query.jinja' import add_query  %}
+{% block child_block_include %}
+<link rel="alternate" type="application/rss+xml" href="{{request.path}}/rss{{add_query(request.query_string)}}"/>
+{% endblock %}
 {% block blog_contents %}
     {% include 'components/blog_contents.jinja' %}
 {%- endblock %}
