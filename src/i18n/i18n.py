@@ -11,7 +11,8 @@ class Language:
     """Stores metadata about supported translations"""
     def __init__(self, locale, gettext_instance,) -> None:
         self.locale = locale
-        self.instance = gettext_instance
+
+        self.priviblur_translations = gettext_instance
 
         self.name, self.translation_percentage = LOCALE_DATA[locale]
 
@@ -27,10 +28,10 @@ def initialize_locales() -> typing.Mapping[str, Language]:
     try:
         # Initialize english locale first so that we may use it as a fallback
 
-        english_instance = gettext.translation("priviblur", localedir="locales", languages=("en_US",))
+        priviblur_english_instance = gettext.translation("priviblur", localedir="locales", languages=("en_US",))
 
         languages = {
-            "en_US": Language("en_US", english_instance)
+            "en_US": Language("en_US", priviblur_english_instance)
         }
 
         for locale in SUPPORTED_LANGUAGES:
@@ -38,7 +39,7 @@ def initialize_locales() -> typing.Mapping[str, Language]:
                 continue
 
             instance = gettext.translation("priviblur", localedir="locales", languages=(locale,))
-            instance.add_fallback(english_instance)
+            instance.add_fallback(priviblur_english_instance)
 
             languages[locale] = Language(locale, instance)
     except FileNotFoundError as e:
@@ -58,7 +59,7 @@ def translate(language : str, id : str, number : int | float | None = None,
               substitution : str | dict | None = None) -> str:
     app = sanic.Sanic.get_app("Priviblur")
 
-    gettext_instance = app.ctx.LANGUAGES[language].instance
+    gettext_instance = app.ctx.LANGUAGES[language].priviblur_translations
 
     if number is not None:
         translated = gettext_instance.ngettext(id, f"{id}_plural", number)

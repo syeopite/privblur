@@ -24,7 +24,7 @@ for locale, pofile in locales_to_pofiles.items():
     lines.append(f""""{locale}": ("{language_name}", {translation_percentage})""")
 
 
-with open("src/helpers/i18n_data.py", "w") as file:
+with open("src/i18n/i18n_data.py", "w") as file:
     file.write("LOCALE_DATA = {\n")
     for line in lines:
         file.write(f"    {line},\n")
